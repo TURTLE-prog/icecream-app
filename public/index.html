@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      name="description"
+      content="A tiny, dramatic ice cream decision machine."
+    />
+    <title>Ice Cream Council 🍦</title>
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+
+  <body>
+    <canvas id="confetti-canvas"></canvas>
+
+    <main class="app-shell">
+      <!-- PLAYER ASSIGNMENT SCREEN -->
+      <section id="assign-screen" class="screen">
+        <div class="sprinkle sprinkle-one">🍬</div>
+        <div class="sprinkle sprinkle-two">✨</div>
+        <div class="sprinkle sprinkle-three">🍒</div>
+
+        <div class="logo-orb">🍦</div>
+
+        <p class="eyebrow">THE OFFICIAL</p>
+        <h1>Ice Cream<br />Council</h1>
+
+        <p class="subtitle">
+          Two humans. One important decision.<br />
+          Zero room for boring democracy.
+        </p>
+
+        <div class="assign-buttons">
+          <button class="player-choice turtle-choice" data-player="A" data-emoji="🐢">
+            <span class="player-emoji">🐢</span>
+            <span>
+              <strong>Player A</strong>
+              <small>The wise snack turtle</small>
+            </span>
+          </button>
+
+          <button class="player-choice panda-choice" data-player="B" data-emoji="🐼">
+            <span class="player-emoji">🐼</span>
+            <span>
+              <strong>Player B</strong>
+              <small>The hungry chaos panda</small>
+            </span>
+          </button>
+        </div>
+
+        <p id="assign-status" class="status-note hidden" aria-live="polite"></p>
+
+        <p class="tiny-note">
+          Pick carefully. Your player seat locks to this device.
+        </p>
+      </section>
+
+      <!-- MAIN GAME SCREEN -->
+      <section id="main-screen" class="screen hidden">
+        <div class="top-bar">
+          <div id="player-badge" class="player-badge"></div>
+
+          <a href="#" id="change-player" class="change-player">
+            Not you? Switch critter
+          </a>
+        </div>
+
+        <div class="question-card">
+          <div class="question-emoji">🍦</div>
+          <p class="eyebrow">THE BIG QUESTION</p>
+          <h2 id="question">Should we get ice cream?</h2>
+          <p class="question-subtext">
+            Choose carefully. The Council is watching.
+          </p>
+        </div>
+
+        <!-- YES / NO BUTTONS -->
+        <div id="buttons" class="vote-buttons">
+          <button id="yes-button" class="vote-button yes-button" data-choice="yes">
+            <span class="vote-icon">🍦</span>
+            <span>
+              <strong>YES</strong>
+              <small>Obviously.</small>
+            </span>
+          </button>
+
+          <button id="no-button" class="vote-button no-button" data-choice="no">
+            <span class="vote-icon">🥦</span>
+            <span>
+              <strong>NO</strong>
+              <small>Who hurt you?</small>
+            </span>
+          </button>
+        </div>
+
+        <!-- WAITING STATE -->
+        <div id="waiting" class="status-card hidden" aria-live="polite">
+          <div class="spinner"></div>
+          <h3>Vote submitted!</h3>
+          <p>Waiting for the other mysterious creature...</p>
+          <small>They may be busy emotionally preparing for dessert.</small>
+        </div>
+
+        <!-- SUSPENSE STATE -->
+        <div id="suspense" class="status-card suspense-card hidden" aria-live="polite">
+          <div class="magic-orb">🔮</div>
+          <h3 id="suspense-message">Checking the freezer...</h3>
+          <p>The Ice Cream Council is deliberating.</p>
+        </div>
+
+        <!-- RESULT STATE -->
+        <div id="result" class="result-card hidden" aria-live="polite"></div>
+
+        <p id="status-note" class="status-note hidden" aria-live="polite"></p>
+
+        <!-- LOCAL HISTORY -->
+        <details id="history" class="history-panel">
+          <summary>
+            <span>📜 Chronicles of Dessert</span>
+            <small>Tap to open</small>
+          </summary>
+
+          <div id="history-list" class="history-list"></div>
+        </details>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
