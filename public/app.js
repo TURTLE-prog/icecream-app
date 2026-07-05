@@ -9,6 +9,7 @@ const HISTORY_KEY = "icecream:chronicles";
 const SHOWN_RESULT_KEY = "icecream:shown-result-key";
 const HISTORY_MARKER_KEY = "icecream:history-marker-key";
 const CONFETTI_MARKER_KEY = "icecream:confetti-marker-key";
+const OTHER_VOTE_NOTIFICATION_KEY = "icecream:other-vote-notification-key";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -160,6 +161,7 @@ async function claimPlayer(nextPlayer, nextEmoji) {
     }
 
     savePlayer(payload?.player || nextPlayer, nextEmoji);
+    await requestTurnNotificationPermission();
     window.location.reload();
   } catch (error) {
     console.error(error);
@@ -408,6 +410,11 @@ function renderState(nextState) {
     player === "A"
       ? nextState.playerA
       : nextState.playerB;
+  const otherPlayer = player === "A" ? "B" : "A";
+  const otherVote =
+    otherPlayer === "A"
+      ? nextState.playerA
+      : nextState.playerB;
 
   // Fresh round: both players have no vote yet.
   if (isFreshRound(nextState)) {
@@ -416,9 +423,10 @@ function renderState(nextState) {
     localStorage.removeItem(SHOWN_RESULT_KEY);
     localStorage.removeItem(HISTORY_MARKER_KEY);
     localStorage.removeItem(CONFETTI_MARKER_KEY);
+    localStorage.removeItem(OTHER_VOTE_NOTIFICATION_KEY);
 
     showVotingButtons();
-    stopPolling();
+    startPolling();
 
     return;
   }
@@ -430,7 +438,12 @@ function renderState(nextState) {
       startPolling();
     } else {
       showVotingButtons();
-      stopPolling();
+
+      if (otherVote.voted) {
+        notifyOtherPlayerVoted(nextState, otherPlayer);
+      }
+
+      startPolling();
     }
 
     return;
@@ -492,6 +505,51 @@ function showWaiting() {
   waiting.classList.remove("hidden");
   suspense.classList.add("hidden");
   result.classList.add("hidden");
+}
+
+function notifyOtherPlayerVoted(state, otherPlayer) {
+  const notificationKey = getOtherVoteNotificationKey(state, otherPlayer);
+
+  showStatusNote(`Player ${otherPlayer} has voted. Your turn.`);
+
+  if (localStorage.getItem(OTHER_VOTE_NOTIFICATION_KEY) === notificationKey) {
+    return;
+  }
+
+  localStorage.setItem(OTHER_VOTE_NOTIFICATION_KEY, notificationKey);
+
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  try {
+    new Notification("Ice Cream Council", {
+      body: `Player ${otherPlayer} voted. Your turn.`,
+      tag: notificationKey,
+    });
+  } catch {
+    // Browser notifications are optional.
+  }
+}
+
+function getOtherVoteNotificationKey(state, otherPlayer) {
+  return [
+    "other-voted",
+    state.roundId || getResultKey(state),
+    otherPlayer,
+  ].join("-");
+}
+
+async function requestTurnNotificationPermission() {
+  if (!("Notification" in window) || Notification.permission !== "default") {
+    return;
+  }
+
+  try {
+    await Notification.requestPermission();
+  } catch {
+    // Some browsers decline permission prompts outside supported moments.
+  }
 }
 
 function startSuspense(state, resultKey) {
